@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skincare Prodiction</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body x-data="{
+  products: null,
+  skin_type: '',
+  skin: '',
+  submit() {
+    this.skin_type = this.skin;
+    const formData = new FormData();
+    formData.append('skin_type', this.skin);
+    fetch('/recommend', { 
+      method: 'post',
+      body: formData,
+    })
+    .then(response => response.json())
+    .then(response => {
+      this.products = response.data;
+    })
+    .catch(error => console.error('Error:', error));
+  }
+}">
+  <div class="container mx-auto lg:w-[1200px] md:w-[900px] w-[400px] my-16">
+
+    {# HERO #}
+
+    <div class="flex flex-col xl:flex-row gap-0 md:gap-16 pb-6 md:pb-20 px-4">
+      <div class="flex flex-col">
+        <h1 class="text-4xl font-bold text-center my-6">Welcome</h1>
+        <p class="text-sm">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sit amet tincidunt justo. In lacinia luctus
+          sapien, quis efficitur massa cursus a. Vivamus turpis metus, venenatis congue turpis vel, ullamcorper faucibus
+          nunc. Maecenas dapibus magna lacus,
+          ut convallis purus convallis eget. Donec ut lorem quis est luctus sagittis ac a nibh. Nunc et urna tincidunt,
+          vulputate dui eu, efficitur nibh. Sed sodales ultricies lorem in scelerisque. In vehicula, sem at semper
+          imperdiet, sapien
+          tellus pretium sem, ut feugiat quam tellus a elit. Ut magna nunc, blandit nec metus sed, tempus placerat quam.
+          Donec sit amet nisi pretium, pellentesque mauris vitae, fermentum felis. Ut mattis sed arcu et pellentesque.
+          Etiam efficitur,
+          neque rhoncus posuere scelerisque, velit libero viverra lacus, in rutrum lectus libero vel dolor. Nulla
+          elementum metus vitae massa rutrum, eget imperdiet nunc fringilla. Morbi gravida lacus sit amet convallis
+          faucibus. Aliquam erat
+          volutpat. Donec sollicitudin metus justo, in dignissim lacus placerat vitae. Nullam vehicula est sed ligula
+          sodales, in elementum ante finibus. Nam eleifend sem at lectus cursus, elementum mattis lectus convallis.
+        </p>
+      </div>
+      <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Images" class="mt-10 w-full xl:w-5/12" />
+    </div>
+
+    {# SEARCH #}
+
+    <div class="relative rounded-md mx-4 lg:mx-0">
+      <img src="{{ url_for('static', filename='images/search.png') }}" alt="search"
+        class="absolute left-4 top-1/2 transform -translate-y-1/2 w-6" />
+      <img src="{{ url_for('static', filename='images/close.png') }}" alt="close" x-on:click="skin=''"
+        x-show="skin.length > 0" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-6" />
+      <input type="text" name="skin" id="name"
+        placeholder="Enter Your Type Skin (e.g., Normal, Dry, Oily, Combination, Sensitive)"
+        class="w-full h-full px-12 rounded-full border border-gray-300 py-3 rounded-md focus:outline-none focus:border-gray-700 focus:outline-none focus:bg-gray-300 focus:shadow-lg"
+        x-on:keydown.enter="submit()" x-model="skin" />
+    </div>
+
+    {# RESULT #}
+
+    <div x-show="products" class="w-full pt-12">
+      <template x-if="products && products.length === 0">
+        <p>Rekomendasi tidak ada untuk type kulit <span x-text="skin_type"></span></p>
+      </template>
+      <template x-if="products && products.length > 0">
+        <div>
+          <h1 class="text-2xl ml-2 lg:ml-0"><span x-text="products.length"></span> Rekomendasi product untuk type kulit
+            <span x-text="skin_type"></span>
+          </h1>
+          <div class="mt-6 relative overflow-x-auto">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+              <thead class="text-xs bg-gray-700 text-gray-200 uppercase dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th scope="col" class="px-6 py-3">
+                    Product name
+                  </th>
+                  <th scope="col" class="px-6 py-3">
+                    Category
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <template x-for="product in products" :key="product.name">
+                  <tr class="bg-white dark:bg-gray-800">
+                    <td class="px-6 py-4 font-medium text-gray-900 flex flex-row gap-4 text-left">
+                      <img :src="'{{ url_for('static', filename='images/products/') }}' + product.name + '.png'"
+                        :alt="product.name" class="mx-auto md:m-0 w-12 lg:w-28" />
+                      <p x-text="product.name"></p>
+                    </td>
+                    <td class="px-6 py-4">
+                      <p x-text="product.type"></p>
+                    </td>
+                  </tr>
+                </template>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+  </div>
+</body>
+
+</html>
