@@ -1,4 +1,4 @@
-from app import app
+from main import app
 from flask import render_template, jsonify, request
 from http import HTTPStatus
 from recommendation import recommend
